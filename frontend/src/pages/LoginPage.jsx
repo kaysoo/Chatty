@@ -100,7 +100,7 @@ const LoginPage = () => {
                 <div className='text-center'>
                     <p className='text-base-content/60'>
                       don&apos;t have an account?&nbsp;
-                      <Link to='signup' className='link link-primary'>Create account</Link>
+                      <Link to='/signup' className='link link-primary'>Create account</Link>
                     </p>
                 </div>
             </div>
