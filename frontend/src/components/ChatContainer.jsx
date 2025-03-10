@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import ChatHeader from './ChatHeader'
 import MessageInput from './ChatInput'
@@ -9,12 +9,21 @@ import { formatMessageTime } from '../lib/utils'
 import { axiosInstance } from '../lib/axios'
 
 const ChatContainer = () => {
-    const {messages, getMessages,fetchMessages, isMessagesLoading, selectedUser} = useChatStore()
-    const {authUser} = useAuthStore()
+    const {messages, getMessages, isMessagesLoading, selectedUser,subscribeToMessages,unsubscribeFromMessages} = useChatStore()
+    const {authUser} = useAuthStore();
+    const messageEndRef = useRef();
 
     useEffect(() => {
       getMessages(selectedUser._id)
-    }, [selectedUser._id, getMessages])
+      subscribeToMessages();
+
+      return ()=> unsubscribeFromMessages()
+    }, [selectedUser._id, getMessages,subscribeToMessages,unsubscribeFromMessages])
+
+    useEffect(()=>{
+        if(messageEndRef.current && messages){
+        messageEndRef.current.scrollIntoView({behavior:"smooth"});}
+    },[messages])
     if(isMessagesLoading) {
         return (
             <div className='flex-1 flex flex-col overflow-auto'>
@@ -33,6 +42,7 @@ const ChatContainer = () => {
                 messages.map((message)=>(
                     <div
                     key={message._id}
+                    ref={messageEndRef}
                     className={`chat ${message.senderId === authUser._id ? 'chat-end' : 'chat-start'}`}
                     >
                         <div className='chat-image avatar'>
